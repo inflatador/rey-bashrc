@@ -1,0 +1,63 @@
+#!/bin/bash
+
+#
+# List domains configured with Rackspace Cloud DNS
+
+. $BASHRC_BASE/bashrc/errors.bash
+
+function usage() {
+  echo "Usage: brc-dns-listdomains [-h] [-a BRC_AUTHTOKEN]\\"
+  echo "Example:"
+  echo "  # brc-dns-listdomains -a 1a2b3c4d5e6f7g8h9i0j \\"
+
+  echo "Arguments:"
+  echo "  -a X	Authentication token.  This can be set via the environment"
+  echo "        variable BRC_AUTHTOKEN instead of as an argument."
+  echo "  -h	Print this help."
+}
+
+USAGEFLAG=0
+while getopts ":a:h:" arg; do
+  case $arg in
+    a) BRC_AUTHTOKEN=$OPTARG;;
+    h) usage && exit 0;;
+    :) echo "ERROR: Option -$OPTARG requires an argument."
+       USAGEFLAG=1;;
+    *) echo "ERROR: Invalid option: -$OPTARG"
+       USAGEFLAG=1;;
+  esac
+done #End arguments
+shift $(($OPTIND - 1))
+
+for ARG in BRC_AUTHTOKEN ; do
+  if [ -z "${!ARG}" ]; then
+    echo "ERROR: Must define $ARG in environment or argument"
+    USAGEFLAG=1
+  fi
+done
+
+if [ $USAGEFLAG -ne 0 ]; then
+  usage && exit 1
+fi
+
+DNS_ENDPOINT=$( $DNS_ENDPOINT )
+
+# CURL command used for listing domains
+DATA=$( curl --write-out \\n%{http_code} --silent --output - \
+             "$DNS_ENDPOINT/domains" \
+             -X GET \
+             -H "Content-Type: application/json" \
+             -H "X-Auth-Token: $BRC_AUTHTOKEN" \
+          2>/dev/null )
+RETVAL=$?
+CODE=$( echo "$DATA" | tail -n 1 )
+
+# Check for failed API call
+if [ $RETVAL -ne 0 ]; then
+  errorcurlfail
+elif [[ $(echo "$CODE" | grep -cE '^2..$') -eq 0 ]]; then
+  errornot200 $CODE $( echo "$DATA" | head -n -1 )
+fi
+
+echo "Response code: $CODE"
+exit 0

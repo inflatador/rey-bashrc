@@ -15,8 +15,6 @@ fi
 
 # Hard-coded - fix this
 export BRC_REGION=$BRC_REGION
-export MONITOR_ENDPOINT="https://dns.api.rackspacecloud.com/v1.0"
+export DNS_ENDPOINT="https://dns.api.rackspacecloud.com/v1.0"
 export PATH=$PATH:$BASHRC_BASE/bashrc/dns
-
-
 
