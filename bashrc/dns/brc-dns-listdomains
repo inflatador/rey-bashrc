@@ -42,13 +42,14 @@ fi
 
 DNS_ENDPOINT=$( $DNS_ENDPOINT )
 
-# CURL command used for listing domains
-DATA=$( curl --write-out \\n%{http_code} --silent --output - \
-             "$DNS_ENDPOINT/domains" \
-             -X GET \
-             -H "Content-Type: application/json" \
-             -H "X-Auth-Token: $BRC_AUTHTOKEN" \
-          2>/dev/null )
+DATA=$(curl --write-out \\n%{http_code} --silent --output - \
+            $DNS_ENDPOINT/$TENANT_ID/domains\
+            -H "Content-Type: application/json" \
+            -d '{ "auth": { 
+                  "RAX-KSKEY:apiKeyCredentials": {
+                    "apiKey": "'$BRC_API_KEY'",
+                    "username": "'$BRC_USERNAME'" } } }' \
+         2>/dev/null )
 RETVAL=$?
 CODE=$( echo "$DATA" | tail -n 1 )
 
@@ -58,6 +59,5 @@ if [ $RETVAL -ne 0 ]; then
 elif [[ $(echo "$CODE" | grep -cE '^2..$') -eq 0 ]]; then
   errornot200 $CODE $( echo "$DATA" | head -n -1 )
 fi
-
 echo "Response code: $CODE"
 exit 0
