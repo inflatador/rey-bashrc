@@ -43,12 +43,9 @@ fi
 DNS_ENDPOINT=$( $DNS_ENDPOINT )
 
 DATA=$(curl --write-out \\n%{http_code} --silent --output - \
-            $DNS_ENDPOINT/$TENANT_ID/domains\
+            $DNS_ENDPOINT/$TENANT_ID/domains \
             -H "Content-Type: application/json" \
-            -d '{ "auth": { 
-                  "RAX-KSKEY:apiKeyCredentials": {
-                    "apiKey": "'$BRC_API_KEY'",
-                    "username": "'$BRC_USERNAME'" } } }' \
+            -H "X-Auth-Token: $BRC_AUTHTOKEN" \
          2>/dev/null )
 RETVAL=$?
 CODE=$( echo "$DATA" | tail -n 1 )
