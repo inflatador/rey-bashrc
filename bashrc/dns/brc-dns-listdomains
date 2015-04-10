@@ -4,6 +4,7 @@
 # List domains configured with Rackspace Cloud DNS
 
 . $BASHRC_BASE/bashrc/errors.bash
+. $BASHRC_BASE/bashrc/dns.bash
 
 function usage() {
   echo "Usage: brc-dns-listdomains [-h] [-a BRC_AUTHTOKEN]\\"
@@ -40,10 +41,11 @@ if [ $USAGEFLAG -ne 0 ]; then
   usage && exit 1
 fi
 
-DNS_ENDPOINT=$( $DNS_ENDPOINT )
+#DNS_ENDPOINT=https://dns.api.rackspacecloud.com/v1.0
 
-DATA=$(curl --write-out \\n%{http_code} --silent --output - \
+DATA=$(curl  \
             $DNS_ENDPOINT/$TENANT_ID/domains \
+			-X GET \
             -H "Content-Type: application/json" \
             -H "X-Auth-Token: $BRC_AUTHTOKEN" \
          2>/dev/null )
