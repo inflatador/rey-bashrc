@@ -59,15 +59,19 @@ RETVAL=$?
 CODE=$( echo "$DATA" | tail -n 1 )
 
 # Check for failed API call
-if [ $RETVAL -ne 0 ]; then
-  errorcurlfail
-elif [[ $(echo "$CODE" | grep -cE '^2..$') -eq 0 ]]; then
-  errornot200 $CODE $( echo "$DATA" | head -n -1 )
-fi
-echo "Response code: $CODE"
+#if [ $RETVAL -ne 0 ]; then
+#  errorcurlfail
+#elif [[ $(echo "$CODE" | grep -cE '^2..$') -eq 0 ]]; then
+#  errornot200 $CODE $( echo "$DATA" | head -n -1 )
+#fi
+#echo "Response code: $CODE"
 
-DATA=$( echo "$DATA" | head -n -1 | $BRCUTIL/brc-util-json.tool )
+
+# Going to forego BRC's json tool, and experiment with parsing the raw json through jshon 
+#DATA=$( echo "$DATA" | head -n -1 | $BRCUTIL/brc-util-json.tool )
 
 echo "$DATA"
+#echo "$CODE"
+
 exit 0
 exit 0
